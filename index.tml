@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Envelope</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    background: radial-gradient(circle, #1a1a2e, #000);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .envelope {
+    width: 90%;
+    max-width: 300px;
+    height: 180px;
+    background: #d32f2f;
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    text-align: center;
+    color: white;
+    font-size: 22px;
+    line-height: 180px;
+    z-index: 10;
+    user-select: none;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    transition: transform 0.6s ease;
+  }
+
+  .envelope:hover {
+    transform: scale(1.03);
+  }
+
+  .money {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: gold;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-weight: bold;
+    color: #333;
+    opacity: 0;
+  }
+
+  .pop {
+    animation: popUp 4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes popUp {
+    0% { transform: translateX(-50%) translateY(20px); opacity: 0; }
+    100% { transform: translateX(-50%) translateY(-140px); opacity: 1; }
+  }
+
+  .disabled {
+    background: #777;
+    cursor: not-allowed;
+  }
+
+  .firework {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: explode 2.5s ease-out forwards;
+  }
+
+  @keyframes explode {
+    from { transform: scale(0); opacity: 1; }
+    to { transform: scale(25); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="envelope" id="envelope" onclick="openEnvelope()">
+  🎁 Open Envelope
+  <div class="money" id="money"></div>
+</div>
+
+<script>
+const opened = localStorage.getItem('opened') === 'true';
+const savedAmount = localStorage.getItem('amount');
+
+function showResult(amount) {
+  const envelope = document.getElementById("envelope");
+  envelope.classList.add("disabled");
+  envelope.innerHTML = amount + "<div class='money' id='money'></div>";
+
+  const moneyDiv = document.getElementById("money");
+  moneyDiv.textContent = amount;
+  moneyDiv.classList.add("pop");
+
+  const message = new SpeechSynthesisUtterance("Happy birthday dondon");
+  message.rate = 0.9;
+  speechSynthesis.speak(message);
+
+  for (let i = 0; i < 6; i++) {
+    setTimeout(createFirework, i * 500);
+  }
+}
+
+if (opened && savedAmount) {
+  showResult(savedAmount);
+}
+
+function openEnvelope() {
+  if (localStorage.getItem('opened') === 'true') return;
+
+  const amounts = ["₱200", "₱300", "₱500", "₱1000"];
+  const randomAmount = amounts[Math.floor(Math.random() * amounts.length)];
+
+  localStorage.setItem('opened', 'true');
+  localStorage.setItem('amount', randomAmount);
+
+  showResult(randomAmount);
+}
+
+function createFirework() {
+  const firework = document.createElement("div");
+  firework.classList.add("firework");
+
+  const colors = ["#ff5252","#ffd740","#40c4ff","#69f0ae","#e040fb"];
+  firework.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+  firework.style.left = Math.random() * window.innerWidth + "px";
+  firework.style.top = Math.random() * window.innerHeight / 2 + "px";
+
+  document.body.appendChild(firework);
+  setTimeout(() => { firework.remove(); }, 2500);
+}
+</script>
+
+</body>
+</html>
